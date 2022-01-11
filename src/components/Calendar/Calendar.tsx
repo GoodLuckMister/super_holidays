@@ -1,6 +1,4 @@
-import { useState } from 'react';
-import { useSelector } from 'react-redux';
-import selectors from 'redux/selectors';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { axiosApiInstance } from 'api/axios';
 import Calendar from 'react-calendar';
 import { Select, Modal } from 'antd';
@@ -8,16 +6,20 @@ import { InputWrapper, WrapperButton } from './styles';
 import { eng } from 'helpers/eng';
 import 'react-calendar/dist/Calendar.css';
 import './calendar.css';
+import { TypeUserDates } from 'redux/reducers/types';
+import Notification from 'components/Notification';
 
 interface DataPickerProps {
   dayToDay: Date;
+  setDates?: Dispatch<SetStateAction<TypeUserDates[]>>;
+  id: number | undefined;
 }
 interface OnSubmit {
   start_day: Date;
   end_day: Date;
   type: string;
   status: string;
-  userId: number | null;
+  userId: number | undefined;
 }
 
 export enum Status {
@@ -34,9 +36,11 @@ export enum VacationType {
 
 type Visible = boolean;
 
-export default function DataPicker({ dayToDay }: DataPickerProps): JSX.Element {
-  const stateUser = useSelector(selectors.getUser);
-
+export default function DataPicker({
+  dayToDay,
+  setDates,
+  id
+}: DataPickerProps): JSX.Element {
   const [line, setLine] = useState<Date[]>([]);
   const [value, setValue] = useState<string>(VacationType.VACATION);
   const [isModalVisible, setIsModalVisible] = useState<Visible>(false);
@@ -53,9 +57,17 @@ export default function DataPicker({ dayToDay }: DataPickerProps): JSX.Element {
   };
   const createBook = async (event: OnSubmit) => {
     try {
-      await axiosApiInstance.post(`booking`, event);
+      const { data } = await axiosApiInstance.post(`booking`, event);
+
+      if (setDates) {
+        setDates(prev => {
+          return [data, ...prev];
+        });
+      }
+      Notification.openNotificationWithIcon(Notification.Not.success);
     } catch (e) {
       console.log(e);
+      Notification.openNotificationWithIcon(Notification.Not.error);
     }
   };
   async function onSubmitCalendar() {
@@ -69,11 +81,11 @@ export default function DataPicker({ dayToDay }: DataPickerProps): JSX.Element {
     }
 
     const event: OnSubmit = {
-      start_day: line[0],
+      start_day: new Date(line[0].setHours(line[0].getHours() + 5)),
       end_day: line[1],
       type: value,
       status: Status.PENDING,
-      userId: stateUser && stateUser.id
+      userId: id
     };
     await createBook(event);
   }

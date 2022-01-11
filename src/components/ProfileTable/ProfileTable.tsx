@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { TypeUserDates } from 'redux/reducers/types';
+import { TypeUserDates, Status, VacationType } from 'redux/reducers/types';
 import { FIRST_PAGE, PAGE_SIZE } from './const';
-import { Table } from 'antd';
+import { Table, Typography } from 'antd';
 
 interface Props {
   dates: TypeUserDates[] | undefined;
@@ -14,28 +14,32 @@ export default function ProfileTable(props: Props): JSX.Element {
   const columns = [
     {
       key: '1',
-      title: 'Dates',
+      title: 'DATES',
       dataIndex: 'dates',
       render: (_: any, e: TypeUserDates): JSX.Element => {
         return (
-          <p>
-            {e.start_day} - {e.end_day}{' '}
-          </p>
+          <Typography.Title level={5}>
+            {e.start_day.toString().split(':')[0].slice(0, 10)} -{' '}
+            {e.end_day.toString().split(':')[0].slice(0, 10)}{' '}
+          </Typography.Title>
         );
       }
     },
     {
       key: '3',
-      title: 'status',
-      dataIndex: 'approved',
-      render: (approved: boolean): JSX.Element => {
-        return <p>{approved ? 'approve' : 'pending'}</p>;
+      title: 'STATUS',
+      dataIndex: 'status',
+      render: (status: Status): JSX.Element => {
+        return <Typography.Title level={5}>{status}</Typography.Title>;
       }
     },
     {
       key: '4',
-      title: 'type',
-      dataIndex: 'type'
+      title: 'TYPE',
+      dataIndex: 'type',
+      render: (type: VacationType): JSX.Element => {
+        return <Typography.Title level={5}>{type}</Typography.Title>;
+      }
     }
   ];
 

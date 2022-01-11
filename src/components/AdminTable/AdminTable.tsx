@@ -11,6 +11,7 @@ import { User } from 'redux/reducers/types';
 import { Table, Input, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import ChoseStatus from './choseStatus';
+import Notification from 'components/Notification';
 
 interface Props {
   searchData: User[];
@@ -21,6 +22,7 @@ export default function UsersTable({
   searchData,
   setSearchData
 }: Props): JSX.Element {
+  const [page, setPage] = useState<number>(1);
   const [value, setValue] = useState<string>('');
   const [filtered, setFiltered] = useState<User[]>([]);
   let canceled = false;
@@ -29,9 +31,10 @@ export default function UsersTable({
       const { data } = await axiosApiInstance.get('users');
       if (!canceled) {
         setSearchData(data);
-        setFiltered(data);
+        setFiltered(data.filter((e: User) => e.dates[0]));
       }
     } catch (e) {
+      Notification.openNotificationWithIcon(Notification.Not.error);
       console.log(e);
     }
   }, [setSearchData]);
@@ -54,7 +57,7 @@ export default function UsersTable({
       );
       setFiltered(filterValue);
     } else {
-      setFiltered(searchData);
+      setFiltered(searchData.filter((element: User) => element.dates[0]));
     }
   };
 
@@ -77,7 +80,7 @@ export default function UsersTable({
       },
       render: (_: any, record: User): JSX.Element => {
         return (
-          record.dates[0] && (
+          record?.dates[0] && (
             <div>
               <Typography.Title level={5}>
                 {record.first_name} {record.last_name}
@@ -97,7 +100,8 @@ export default function UsersTable({
               return (
                 <div key={e.id}>
                   <Typography.Title level={5}>
-                    {e.start_day} - {e.end_day}
+                    {e.start_day.toString().split(':')[0].slice(0, 10)} -{' '}
+                    {e.end_day.toString().split(':')[0].slice(0, 10)}{' '}
                   </Typography.Title>
                 </div>
               );
@@ -148,9 +152,16 @@ export default function UsersTable({
 
   return (
     <Table
-      rowKey={record => record.id}
+      rowKey={record => record?.id}
       columns={columns}
       dataSource={filtered}
+      pagination={{
+        current: page,
+        pageSize: 5,
+        onChange: e => {
+          setPage(e);
+        }
+      }}
     />
   );
 }

@@ -6,6 +6,7 @@ import { Status } from 'redux/reducers/types';
 import { Select, Button } from 'antd';
 import { accessUser } from 'helpers/constants';
 import { WrapperButtons } from 'helpers/globalStyle';
+import Notification from 'components/Notification';
 
 const { Option } = Select;
 
@@ -29,8 +30,10 @@ export default function ChoseStatus({
         status: status
       });
       fetchData();
+      Notification.openNotificationWithIcon(Notification.Not.success);
     } catch (e) {
       console.log(e);
+      Notification.openNotificationWithIcon(Notification.Not.error);
     }
   };
 

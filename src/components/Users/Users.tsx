@@ -26,7 +26,7 @@ export default function Users(): JSX.Element {
           </>
         )}
 
-        {edit && <UserEdit user={user} />}
+        {edit && <UserEdit user={user} setEdit={setEdit} />}
       </StyledContent>
     </StyledLayout>
   );

@@ -7,7 +7,7 @@ interface AccessUser {
   login: string;
 }
 
-export const URL = 'http://localhost:8080/';
+export const URL = 'https://zet-bit-super-holiday-intern.herokuapp.com/';
 export const accessUser: AccessUser = {
   admin: 'admin',
   superAdmin: 'super',

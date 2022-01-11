@@ -7,8 +7,8 @@ export interface User {
   last_name: string;
   role: TypeUserRole;
   isBlocked: boolean;
-  vacation: number;
-  sick_leaves: number;
+  total_vacations: number;
+  total_sick_leaves: number;
   dates: TypeUserDates[];
 }
 
